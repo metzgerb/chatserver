@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	}
 	
 	//store target host ip address
-	memcopy(&serverAddress.sin_addr, hp->h_addr_list[0], hp->h_length);
+	memcpy(&serverAddress.sin_addr, hp->h_addr_list[0], hp->h_length);
 
 	// Set up the socket
 	socketFD = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
