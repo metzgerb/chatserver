@@ -20,9 +20,9 @@
 #define TERM_SENTINEL "!$@"
 
 //error function used for reporting errors
-void error(const char *msg) 
-{ 
-	perror(msg); 
+void error(const char *msg)
+{
+	perror(msg);
 	fflush(stderr);
 	exit(0);
 }
@@ -31,24 +31,32 @@ int main(int argc, char *argv[])
 {
 	int socketFD, portNumber, charsWritten, charsRead;
 	struct sockaddr_in serverAddress;
+	struct hostent *hp;
 	char buffer[MAX_BUFFER];
 	char message[2 * MAX_BUFFER];
 
 	// Check usage & args
-	if (argc != 3) 
+	if (argc != 3)
 	{
-		fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); 
+		fprintf(stderr, "USAGE: %s hostname port\n", argv[0]);
 		fflush(stderr);
-		exit(0); 
+		exit(0);
 	}
-	
+
 	// Set up the server address struct
 	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
 	portNumber = atoi(argv[2]); // Get the port number, convert to an integer from a string
 	serverAddress.sin_family = AF_INET; // Create a network-capable socket
 	serverAddress.sin_port = htons(portNumber); // Store the port number
-	serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
-	
+	//serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+	if (!(hp = gethostbyname(argv[1])))
+	{
+		fprintf(stderr, "%s: bad host name\n", argv[1]);
+		exit(1);
+	}
+	serverAddress->sin_addr = *(in_addr *) hp->h_addr; //store target host ip address
+
 	// Set up the socket
 	socketFD = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
 	if (socketFD < 0)
