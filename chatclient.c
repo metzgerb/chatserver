@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include <netdb.h> 
 
+#define _POSIX_C_SOURCE 200112L
 #define MAX_BUFFER 700
 #define TERM_SENTINEL "!$@"
 
