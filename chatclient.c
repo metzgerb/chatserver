@@ -31,7 +31,6 @@ int main(int argc, char *argv[])
 {
 	int socketFD, portNumber, charsWritten, charsRead;
 	struct sockaddr_in serverAddress;
-	struct hostent *hp;
 	char buffer[MAX_BUFFER];
 	char message[2 * MAX_BUFFER];
 
@@ -50,12 +49,16 @@ int main(int argc, char *argv[])
 	serverAddress.sin_port = htons(portNumber); // Store the port number
 	//serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-	if (!(hp = gethostbyname(argv[1])))
+	struct hostent *hp = gethostbyname(argv[1]);
+	//check for gethost failure
+	if (hp == NULL)
 	{
 		fprintf(stderr, "%s: bad host name\n", argv[1]);
 		exit(1);
 	}
-	serverAddress->sin_addr = *(in_addr *) hp->h_addr; //store target host ip address
+	
+	//store target host ip address
+	memcopy(&serverAddress.sin_addr, hp->h_addr_list[0], hp->h_length);
 
 	// Set up the socket
 	socketFD = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
