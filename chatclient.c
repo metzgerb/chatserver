@@ -42,21 +42,45 @@ int main(int argc, char *argv[])
 	}
 	
 	// Set up the server address struct
-	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
+	/*memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
 	portNumber = atoi(argv[2]); // Get the port number, convert to an integer from a string
 	serverAddress.sin_family = AF_INET; // Create a network-capable socket
 	serverAddress.sin_port = htons(portNumber); // Store the port number
 	serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
-	
+	*/
+
+	//set up server address for connection
+	//Source: beej's guide to network programming
+	int status;
+	struct addrinfo hints;
+	struct addrinfo *servinfo;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
+	hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
+	hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+
+	if ((status = getaddrinfo(argv[1], argv[2], &hints, &servinfo)) != 0) {
+		fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+		exit(1);
+	}
+
+	// servinfo now points to a linked list of 1 or more struct addrinfos
+
+	// ... do everything until you don't need servinfo anymore ....
+
+	//freeaddrinfo(servinfo); // free the linked-list MOVE TO BOTTOM WHEN FINISHED
+
+
 	// Set up the socket
-	socketFD = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
+	socketFD = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol); // Create the socket
 	if (socketFD < 0)
 	{
 		 error("CLIENT: ERROR opening socket");
 	}
 
 	// Connect to server
-	if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to address
+	if (connect(socketFD, servinfo->ai_addr, servinfo->ai_addrlen) < 0) // Connect socket to address
 	{	
 		error("CLIENT: ERROR connecting");
 	}
