@@ -14,9 +14,9 @@ def serve(port_number):
 
 
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     #check total argument count
-    if (len(sys.argv) != 2):
+    if len(sys.argv) != 2:
         print("USAGE: %s port" % sys.argv[0])
     else:
         serve(sys.argv[1]);
