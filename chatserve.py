@@ -5,7 +5,7 @@ Author: Brian Metzger (metzgerb@oregonstate.edu)
 Created: 2019-04-27
 """
 
-import socket
+from socket import *
 import sys
 
 #function that creates the server and sets it to listen for clients
@@ -42,5 +42,7 @@ if __name__ == "__main__":
     #check total argument count
     if len(sys.argv) != 2:
         print("USAGE: %s port" % sys.argv[0])
+    elif not sys.argv[1].isdigit():
+        print("syntax error: port must be a number")
     else:
-        serve(sys.argv[1]);
+        serve(int(sys.argv[1]));
