@@ -15,7 +15,8 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 
-#define BUFFER_SIZE 700
+#define BUFFER_SIZE 500
+#define MAX_BUFFER 700
 
 void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
 
@@ -25,6 +26,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in serverAddress;
 	struct hostent* serverHostInfo;
 	char buffer[BUFFER_SIZE];
+	char message[MAX_BUFFER];
 	char handle[32];
     
 	if (argc < 3) { fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); exit(0); } // Check usage & args
@@ -52,7 +54,19 @@ int main(int argc, char *argv[])
 	fgets(handle, sizeof(handle) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
 	handle[strcspn(handle, "\n")] = '\0'; // Remove the trailing \n that fgets adds
 
-	while (strcmp(buffer, "\\quit") != 0)
+	//prompt user to send port number
+	printf("Enter a handle: ");
+	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
+	fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
+	buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
+
+	//wait for server response before beginning normal chat process
+	memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
+	charsRead = recv(socketFD, message, sizeof(message) - 1, 0); // Read data from the socket, leaving \0 at end
+	if (charsRead < 0) error("# CLIENT: ERROR reading from socket");
+	printf("%s\n", message);
+
+	while (1)
 	{
 		// Get input message from user
 		printf("%s> ", handle);
@@ -60,16 +74,29 @@ int main(int argc, char *argv[])
 		fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
 		buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
 
+		//check if '\quit' command received
+		if (strcmp(buffer, "\\quit") == 0)
+		{
+			//stop client and move to close connection
+			break;
+		}
+
+		//prepend handle to message
+		memset(message, '\0', sizeof(message)); // Clear out the message array
+		strcpy(message, handle);
+		strcat(message, "> ");
+		strcat(message, buffer);
+
 		// Send message to server
 		charsWritten = send(socketFD, buffer, strlen(buffer), 0); // Write to the server
 		if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
 		if (charsWritten < strlen(buffer)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
 
 		// Get return message from server
-		memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
-		charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
+		memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
+		charsRead = recv(socketFD, message, sizeof(message) - 1, 0); // Read data from the socket, leaving \0 at end
 		if (charsRead < 0) error("# CLIENT: ERROR reading from socket");
-		printf("CHATSERVE> %s\n", buffer);
+		printf("%s\n", message);
 	}
 
 	close(socketFD); // Close the socket
