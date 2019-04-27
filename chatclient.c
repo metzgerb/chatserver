@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	struct hostent* serverHostInfo;
 	char buffer[BUFFER_SIZE];
 	char message[MAX_BUFFER];
-	char handle[32];
+	char handle[11];
     
 	if (argc < 3) { fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); exit(0); } // Check usage & args
 
@@ -59,6 +59,11 @@ int main(int argc, char *argv[])
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
 	fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
 	buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
+
+	//send initial message
+	charsWritten = send(socketFD, buffer, strlen(buffer), 0); // Write to the server
+	if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
+	if (charsWritten < strlen(buffer)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
 
 	//wait for server response before beginning normal chat process
 	memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
