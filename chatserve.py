@@ -36,6 +36,9 @@ def serve(port_number):
             #receive message from client
             recd_message = connection_socket.recv(MAX_BUFFER).decode()
             
+            #print message to server
+            print(recd_message)
+            
             #send message back
             send_message = "CHATSERVE> Received message: %s" % recd_message
             connection_socket.send(send_message.encode())
