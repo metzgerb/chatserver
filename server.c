@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 		if (establishedConnectionFD < 0) error("ERROR on accept");
 
 		//loop until '\quit' received
-		While(strcmp(buffer,"\\quit") != 0)
+		while(strcmp(buffer,"\\quit") != 0)
 		{
 			// Get the message from the client and display it
 			memset(buffer, '\0', sizeof(buffer));
