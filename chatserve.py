@@ -10,8 +10,9 @@ import sys
 
 #function that creates the server and sets it to listen for clients
 def serve(port_number):
-    #initialize message length
+    #initialize values
     MAX_BUFFER = 700
+    server_handle = "CHATSERVE> "
     
     #set up server socket
     server_socket = socket(AF_INET, SOCK_STREAM)
@@ -28,7 +29,7 @@ def serve(port_number):
         recd_message = connection_socket.recv(MAX_BUFFER).decode()
             
         #send message back
-        send_message = "CHATSERVE> Connection established."
+        send_message = "%s Connection established." % server_handle
         connection_socket.send(send_message.encode())
         
         #continuously receive messages
@@ -39,8 +40,11 @@ def serve(port_number):
             #print message to server
             print(recd_message)
             
+            #get input from user
+            message = input(server_handle)
+            
             #send message back
-            send_message = "CHATSERVE> Received message: %s" % recd_message
+            send_message = server_handle + message
             connection_socket.send(send_message.encode())
         
         #close connection
