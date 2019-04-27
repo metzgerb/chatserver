@@ -37,11 +37,19 @@ def serve(port_number):
             #receive message from client
             recd_message = connection_socket.recv(MAX_BUFFER).decode()
             
+            #check if socket has closed using length of recd message
+            if len(recd_message) == 0:
+                break
+            
             #print message to server
             print(recd_message)
             
             #get input from user
             message = input(server_handle)
+            
+            #check if message is "\quit"
+            if message == "\\quit":
+                break
             
             #send message back
             send_message = server_handle + message
