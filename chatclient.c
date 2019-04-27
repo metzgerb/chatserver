@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	handle[strcspn(handle, "\n")] = '\0'; // Remove the trailing \n that fgets adds
 
 	//prompt user to send port number
-	printf("Enter a handle: ");
+	printf("Client port number: ");
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
 	fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
 	buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds

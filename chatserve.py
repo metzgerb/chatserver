@@ -24,6 +24,13 @@ def serve(port_number):
         #accept connection
         connection_socket, addr = server_socket.accept()
         
+        #receive port number message from client
+        recd_message = connection_socket.recv(MAX_BUFFER).decode()
+            
+        #send message back
+        send_message = "CHATSERVE> Connection established."
+        connection_socket.send(send_message.encode())
+        
         #continuously receive messages
         while True:
             #receive message from client
