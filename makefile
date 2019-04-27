@@ -8,4 +8,5 @@ server : server.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean :
-	-rm chatclient
+	-rm -rf ./chatclient
+	-rm -rf ./server
