@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	fgets(handle, sizeof(handle) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
 	handle[strcspn(handle, "\n")] = '\0'; // Remove the trailing \n that fgets adds
 
-	while (strcmp(buffer, "\quit") != 0)
+	while (strcmp(buffer, "\\quit") != 0)
 	{
 		// Get input message from user
 		printf("%s> ", handle);
