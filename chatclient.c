@@ -93,9 +93,9 @@ int main(int argc, char *argv[])
 		strcat(message, buffer);
 
 		// Send message to server
-		charsWritten = send(socketFD, buffer, strlen(buffer), 0); // Write to the server
+		charsWritten = send(socketFD, message, strlen(message), 0); // Write to the server
 		if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
-		if (charsWritten < strlen(buffer)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
+		if (charsWritten < strlen(message)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
 
 		// Get return message from server
 		memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
