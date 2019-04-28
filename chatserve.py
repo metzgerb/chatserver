@@ -38,7 +38,7 @@ def serve(port_number):
             recd_message = connection_socket.recv(MAX_BUFFER).decode()
             
             #check if socket has closed using length of recd message
-            if len(recd_message) == 0:
+            if recd_message == "\\quit":
                 break
             
             #print message to server
@@ -49,6 +49,9 @@ def serve(port_number):
             
             #check if message is "\quit"
             if message == "\\quit":
+                #send quit message back
+                send_message = "\\quit"
+                connection_socket.send(send_message.encode())
                 break
             
             #send message back
