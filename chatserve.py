@@ -13,7 +13,7 @@ import sys
 def serve(port_number):
     #initialize values
     MAX_BUFFER = 700
-    SENTINTEL = "@!@"
+    SENTINEL = "@!@"
     server_handle = "CHATSERVE> "
     
     #set up server socket
