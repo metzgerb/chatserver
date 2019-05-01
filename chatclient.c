@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	handle[strcspn(handle, "\n")] = '\0'; // Remove the trailing \n that fgets adds
 
 	//prompt user to send port number
-	printf("Client port number: ");
+	/*printf("Client port number: ");
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
 	fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
 	buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 	memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
 	charsRead = recv(socketFD, message, sizeof(message) - 1, 0); // Read data from the socket, leaving \0 at end
 	if (charsRead < 0) error("# CLIENT: ERROR reading from socket");
-	printf("%s\n", message);
+	printf("%s\n", message);*/
 
 	while (1)
 	{

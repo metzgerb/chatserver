@@ -3,6 +3,7 @@ Python Version: 3
 Description: Runs as a server to connect to chatclient and begin chat session
 Author: Brian Metzger (metzgerb@oregonstate.edu)
 Created: 2019-04-27
+Last Modified: 2019-05-01
 """
 
 from socket import *
@@ -26,11 +27,11 @@ def serve(port_number):
         connection_socket, addr = server_socket.accept()
         
         #receive port number message from client
-        recd_message = connection_socket.recv(MAX_BUFFER).decode()
+        #recd_message = connection_socket.recv(MAX_BUFFER).decode()
             
         #send message back
-        send_message = "%s Connection established." % server_handle
-        connection_socket.send(send_message.encode())
+        #send_message = "%s Connection established." % server_handle
+        #connection_socket.send(send_message.encode())
         
         #continuously receive messages
         while True:
