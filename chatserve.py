@@ -39,7 +39,7 @@ def serve(port_number):
             
             #remove sentinel
             print(recd_message)
-            recd_message = recd_message[:-(len(SENTINEL))]
+            recd_message = recd_message.replace(SENTINEL, "")
             print(recd_message)
             #check if socket has closed using length of recd message
             if recd_message == "\\quit":
