@@ -36,6 +36,7 @@ def serve(port_number):
             while(SENTINEL not in recd_message):
                 buffer = connection_socket.recv(MAX_BUFFER).decode()
                 recd_message += buffer
+                print(recd_message)
             
             #check if socket has closed using length of recd message
             if recd_message == "\\quit" + SENTINEL:
