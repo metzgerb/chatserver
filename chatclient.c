@@ -83,6 +83,8 @@ int main(int argc, char *argv[])
 		strcat(message, buffer);
 		strcat(message, SENTINEL);
 
+		printf("%s", message);
+
 		// Send message to server
 		long length = strlen(message) + 1;
 		char* sendPtr = message;
@@ -110,7 +112,7 @@ int main(int argc, char *argv[])
 		// Get return message from server
 		memset(message, '\0', sizeof(message));
 
-		while (strstr(buffer, TERM_SENTINEL) == NULL)
+		while (strstr(buffer, SENTINEL) == NULL)
 		{
 			memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
 			charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
