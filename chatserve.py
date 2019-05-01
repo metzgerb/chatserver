@@ -35,6 +35,7 @@ def serve(port_number):
             #receive message from client (loops until full message is received
             while(SENTINEL not in recd_message):
                 buffer = connection_socket.recv(MAX_BUFFER).decode()
+                print("%s\n" % buffer)
                 recd_message += buffer
             
             #remove sentinel
