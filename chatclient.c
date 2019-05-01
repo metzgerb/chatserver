@@ -69,6 +69,8 @@ int main(int argc, char *argv[])
 		//check if '\quit' command received
 		if (strcmp(buffer, "\\quit") == 0)
 		{
+			//Add sentinel before sending quit to server
+			strcat(buffer, SENTINEL);
 			//stop client, send  move to close connection
 			charsWritten = send(socketFD, buffer, strlen(buffer), 0); // Write to the server
 			if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
@@ -102,11 +104,6 @@ int main(int argc, char *argv[])
 			length -= s;
 		}
 
-		// Send message to server
-		//charsWritten = send(socketFD, message, strlen(message), 0); // Write to the server
-		//if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
-		//if (charsWritten < strlen(message)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
-
 		// Get return message from server
 		memset(message, '\0', sizeof(message));
 
@@ -126,13 +123,6 @@ int main(int argc, char *argv[])
 
 		//strip term sentinel from return message
 		message[strlen(message) - strlen(SENTINEL)] = '\0';
-		printf("%s\n", message);
-		fflush(stdout);
-
-		// Get return message from server
-		//memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
-		//charsRead = recv(socketFD, message, sizeof(message) - 1, 0); // Read data from the socket, leaving \0 at end
-		//if (charsRead < 0) error("# CLIENT: ERROR reading from socket");
 		
 		//check for quit message from server
 		if (strcmp(message, "\\quit") == 0)
@@ -142,6 +132,7 @@ int main(int argc, char *argv[])
 		}
 
 		printf("%s\n", message);
+		fflush(stdout);
 	}
 
 	close(socketFD); // Close the socket

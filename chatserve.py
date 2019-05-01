@@ -38,7 +38,7 @@ def serve(port_number):
                 recd_message += buffer
             
             #remove sentinel
-            message = message[:-(len(SENTINEL))]
+            recd_message = recd_message[:-(len(SENTINEL))]
             
             #check if socket has closed using length of recd message
             if recd_message == "\\quit":
@@ -53,8 +53,8 @@ def serve(port_number):
             #check if message is "\quit"
             if message == "\\quit":
                 #send quit message back
-                send_message = "\\quit"
-                connection_socket.send(send_message.encode())
+                send_message = "\\quit" + SENTINEL
+                connection_socket.sendall(send_message.encode())
                 break          
             
             #send message back
