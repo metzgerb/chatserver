@@ -17,6 +17,7 @@
 
 #define BUFFER_SIZE 500
 #define MAX_BUFFER 700
+#define SENTINEL "@!@"
 
 void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
 
@@ -50,31 +51,17 @@ int main(int argc, char *argv[])
 
 	//get handle from user
 	printf("Enter a handle: ");
+	fflush(stdout);
 	memset(handle, '\0', sizeof(handle)); // Clear out the buffer array
 	fgets(handle, sizeof(handle) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
 	handle[strcspn(handle, "\n")] = '\0'; // Remove the trailing \n that fgets adds
 
-	//prompt user to send port number
-	/*printf("Client port number: ");
-	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
-	fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
-	buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
-
-	//send initial message
-	charsWritten = send(socketFD, buffer, strlen(buffer), 0); // Write to the server
-	if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
-	if (charsWritten < strlen(buffer)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
-
-	//wait for server response before beginning normal chat process
-	memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
-	charsRead = recv(socketFD, message, sizeof(message) - 1, 0); // Read data from the socket, leaving \0 at end
-	if (charsRead < 0) error("# CLIENT: ERROR reading from socket");
-	printf("%s\n", message);*/
-
+	//loop while sending and receiving messages
 	while (1)
 	{
 		// Get input message from user
 		printf("%s> ", handle);
+		fflush(stdout);
 		memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
 		fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
 		buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
@@ -94,16 +81,58 @@ int main(int argc, char *argv[])
 		strcpy(message, handle);
 		strcat(message, "> ");
 		strcat(message, buffer);
+		strcat(message, SENTINEL);
 
 		// Send message to server
-		charsWritten = send(socketFD, message, strlen(message), 0); // Write to the server
-		if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
-		if (charsWritten < strlen(message)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
+		long length = strlen(message) + 1;
+		char* sendPtr = message;
+
+		//loop and send message until all is sent
+		//modified from source: https://stackoverflow.com/questions/13479760/c-socket-recv-and-send-all-data
+		while (length > 0)
+		{
+			long s = send(socketFD, sendPtr, length, 0);
+
+			//check for write error
+			if (s < 0)
+			{
+				error("# CLIENT: ERROR writing to socket");
+			}
+			sendPtr += s;
+			length -= s;
+		}
+
+		// Send message to server
+		//charsWritten = send(socketFD, message, strlen(message), 0); // Write to the server
+		//if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
+		//if (charsWritten < strlen(message)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
 
 		// Get return message from server
-		memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
-		charsRead = recv(socketFD, message, sizeof(message) - 1, 0); // Read data from the socket, leaving \0 at end
-		if (charsRead < 0) error("# CLIENT: ERROR reading from socket");
+		memset(message, '\0', sizeof(message));
+
+		while (strstr(buffer, TERM_SENTINEL) == NULL)
+		{
+			memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
+			charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
+			//check for socket read error
+			if (charsRead < 0)
+			{
+				error("# CLIENT: ERROR reading from socket");
+			}
+
+			//add new characters
+			strcat(message, buffer);
+		}
+
+		//strip term sentinel from return message
+		message[strlen(message) - strlen(SENTINEL)] = '\0';
+		printf("%s\n", message);
+		fflush(stdout);
+
+		// Get return message from server
+		//memset(message, '\0', sizeof(message)); // Clear out the buffer again for reuse
+		//charsRead = recv(socketFD, message, sizeof(message) - 1, 0); // Read data from the socket, leaving \0 at end
+		//if (charsRead < 0) error("# CLIENT: ERROR reading from socket");
 		
 		//check for quit message from server
 		if (strcmp(message, "\\quit") == 0)
