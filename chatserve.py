@@ -36,10 +36,12 @@ def serve(port_number):
             while(SENTINEL not in recd_message):
                 buffer = connection_socket.recv(MAX_BUFFER).decode()
                 recd_message += buffer
-                print(recd_message)
+            
+            #remove sentinel
+            message = message[:-(len(SENTINEL))]
             
             #check if socket has closed using length of recd message
-            if recd_message == "\\quit" + SENTINEL:
+            if recd_message == "\\quit":
                 break
             
             #print message to server
@@ -47,17 +49,16 @@ def serve(port_number):
             
             #get input from user
             message = input(server_handle)
-            message += SENTINEL
             
             #check if message is "\quit"
-            if message == "\\quit" + SENTINEL:
+            if message == "\\quit":
                 #send quit message back
                 send_message = "\\quit"
                 connection_socket.send(send_message.encode())
                 break          
             
             #send message back
-            send_message = server_handle + message
+            send_message = server_handle + message + SENTINEL
             connection_socket.sendall(send_message.encode())
         
         #close connection
