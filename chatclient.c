@@ -3,6 +3,7 @@
 * Description: Runs as a client to connect to chatserve and begin chat session
 * Sources: Base code used from CS344 client.c file (winter 2019 term)
 * Author: Brian Metzger (metzgerb@oregonstate.edu)
+* Course: CS372 (Spring 2019)
 * Created: 2019-04-26
 * Last Modified: 2019-05-01
 ******************************************************************************/
