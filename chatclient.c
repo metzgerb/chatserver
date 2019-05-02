@@ -15,7 +15,7 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 
-#define BUFFER_SIZE 500
+#define BUFFER_SIZE 503
 #define MAX_BUFFER 700
 #define SENTINEL "@!@"
 
@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
 		strcat(message, "> ");
 		strcat(message, buffer);
 		strcat(message, SENTINEL);
+		printf("%s\n", message);
 
 		// Send message to server
 		long length = strlen(message) + 1;
