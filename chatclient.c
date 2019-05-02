@@ -84,7 +84,6 @@ int main(int argc, char *argv[])
 		strcat(message, "> ");
 		strcat(message, buffer);
 		strcat(message, SENTINEL);
-		printf("%s\n", message);
 
 		// Send message to server
 		long length = strlen(message) + 1;
