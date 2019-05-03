@@ -5,7 +5,7 @@
 * Author: Brian Metzger (metzgerb@oregonstate.edu)
 * Course: CS372 (Spring 2019)
 * Created: 2019-04-26
-* Last Modified: 2019-05-01
+* Last Modified: 2019-05-02
 ******************************************************************************/
 
 #include <stdio.h>
@@ -21,21 +21,26 @@
 #define MAX_BUFFER 700
 #define SENTINEL "@!@"
 
-void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
+void error(const char *msg);
+int connect(char* server, int portNumber);
 
 int main(int argc, char *argv[])
 {
-	int socketFD, portNumber, charsWritten, charsRead;
-	struct sockaddr_in serverAddress;
-	struct hostent* serverHostInfo;
+	int socketFD, charsWritten, charsRead;
+	//struct sockaddr_in serverAddress;
+	//struct hostent* serverHostInfo;
 	char buffer[BUFFER_SIZE];
 	char message[MAX_BUFFER];
 	char handle[11];
     
-	if (argc < 3) { fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); exit(0); } // Check usage & args
+	if (argc < 3) 
+	{ 
+		fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); 
+		exit(0); 
+	}
 
 	// Set up the server address struct
-	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
+	/*memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
 	portNumber = atoi(argv[2]); // Get the port number, convert to an integer from a string
 	serverAddress.sin_family = AF_INET; // Create a network-capable socket
 	serverAddress.sin_port = htons(portNumber); // Store the port number
@@ -49,7 +54,20 @@ int main(int argc, char *argv[])
 	
 	// Connect to server
 	if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to address
+		error("# CLIENT: ERROR connecting");*/
+
+	//create socket and connect to server
+	socketFD = connect(argv[1], atoi(argv[2]));
+
+	//check for socket/connection errors
+	if (socketFD == -1)
+	{
+		error("# CLIENT: ERROR opening socket");
+	}
+	else if (socketFD == -2)
+	{
 		error("# CLIENT: ERROR connecting");
+	}
 
 	//get handle from user
 	printf("Enter a handle: ");
@@ -139,4 +157,55 @@ int main(int argc, char *argv[])
 
 	close(socketFD); // Close the socket
 	return 0;
+}
+
+
+/******************************************************************************
+ * Function name: error
+ * Inputs: Takes a message
+ * Outputs: Returns nothing
+ * Description: The function prints the error and exits the program.
+ ******************************************************************************/
+void error(const char *msg) 
+{ 
+	perror(msg); 
+	exit(0); 
+}
+
+
+/******************************************************************************
+ * Function name: connect
+ * Inputs: Takes the server and port number of the server
+ * Outputs: Returns a socket if connected successfully
+ * Description: The function attempts to connect to the specified server and 
+		port using a TCP connection.
+ ******************************************************************************/
+int connect(char* server, int portNumber)
+{
+	int socket;
+	struct sockaddr_in serverAddress;
+	struct hostent* serverHostInfo;
+
+	// Set up the server address struct
+	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
+	serverAddress.sin_family = AF_INET; // Create a network-capable socket
+	serverAddress.sin_port = htons(portNumber); // Store the port number
+	serverHostInfo = gethostbyname(argv[1]); // Convert the machine name into a special form of address
+	if (serverHostInfo == NULL) { fprintf(stderr, "# CLIENT: ERROR, no such host\n"); exit(0); }
+	memcpy((char*)&serverAddress.sin_addr.s_addr, (char*)serverHostInfo->h_addr_list[0], serverHostInfo->h_length); // Copy in the address
+
+	// Set up the socket
+	socket = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
+
+	//check that socket was opened successfully
+	if (socket < 0)
+		return -1; 
+
+	// Connect to server
+	if (connect(socket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0)
+	{
+		return -2;
+	}
+	
+	return socket;
 }

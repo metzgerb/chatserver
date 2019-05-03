@@ -4,7 +4,7 @@ Description: Runs as a server to connect to chatclient and begin chat session
 Author: Brian Metzger (metzgerb@oregonstate.edu)
 Course: CS372 (Spring 2019)
 Created: 2019-04-27
-Last Modified: 2019-05-01
+Last Modified: 2019-05-02
 """
 
 from socket import *
