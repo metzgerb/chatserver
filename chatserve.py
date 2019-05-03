@@ -23,7 +23,7 @@ def send_msg(client_socket, handle, sentinel):
         return -1          
     else: 
         #send message back
-        message = server_handle + message + sentinel
+        message = handle + message + sentinel
         client_socket.sendall(message.encode())
         return 0
 
