@@ -258,5 +258,5 @@ char* recvMsg(int socketPtr)
 	//strip term sentinel from return message
 	message[strlen(message) - strlen(SENTINEL)] = '\0';
 
-	return message;
+	return (char*) message;
 }
