@@ -245,7 +245,7 @@ int sendMsg(int socketPtr, char handle[])
 	//modified from source: https://stackoverflow.com/questions/13479760/c-socket-recv-and-send-all-data
 	while (length > 0)
 	{
-		long s = send(socketFD, sendPtr, length, 0);
+		long s = send(socketPtr, sendPtr, length, 0);
 
 		//check for write error
 		if (s < 0)
