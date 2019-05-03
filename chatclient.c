@@ -24,15 +24,15 @@
 //function declarations
 void error(const char *msg);
 int connectServer(char* server, int portNumber);
-int sendMsg(int socketPtr, char[] handle);
+int sendMsg(int socketPtr, char handle[]);
 int recvMsg(int socketPtr);
 
 
 int main(int argc, char *argv[])
 {
-	int socketFD, charsWritten;
-	char buffer[BUFFER_SIZE];
-	char message[MAX_BUFFER];
+	int socketFD//, charsWritten;
+	//char buffer[BUFFER_SIZE];
+	//char message[MAX_BUFFER];
 	char handle[11];
 	int msgResult;
     
@@ -196,7 +196,7 @@ int connectServer(char* server, int portNumber)
  *		command is received, the function sends a quit command to the server and
  *		returns 1. All other messages are sent to the server and 0 is returned.
  ******************************************************************************/
-int sendMsg(int socketPtr, char[] handle)
+int sendMsg(int socketPtr, char handle[])
 {
 	char buffer[BUFFER_SIZE];
 	char message[MAX_BUFFER];
