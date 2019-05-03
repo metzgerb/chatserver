@@ -22,7 +22,7 @@
 #define SENTINEL "@!@"
 
 void error(const char *msg);
-int connect(char* server, int portNumber);
+int connectServer(char* server, int portNumber);
 
 int main(int argc, char *argv[])
 {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 		error("# CLIENT: ERROR connecting");*/
 
 	//create socket and connect to server
-	socketFD = connect(argv[1], atoi(argv[2]));
+	socketFD = connectServer(argv[1], atoi(argv[2]));
 
 	//check for socket/connection errors
 	if (socketFD == -1)
@@ -180,7 +180,7 @@ void error(const char *msg)
  * Description: The function attempts to connect to the specified server and 
 		port using a TCP connection.
  ******************************************************************************/
-int connect(char* server, int portNumber)
+int connectServer(char* server, int portNumber)
 {
 	int socket;
 	struct sockaddr_in serverAddress;
