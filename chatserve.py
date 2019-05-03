@@ -34,7 +34,7 @@ def recv_msg(client_socket, sentinel, max_buffer):
     message = ""
     
     #call recv in a loop until sentinel is detected in compiled message
-    while(SENTINEL not in message):
+    while(sentinel not in message):
         buffer = client_socket.recv(max_buffer).decode()
         message += buffer
         
