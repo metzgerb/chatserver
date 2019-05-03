@@ -1,7 +1,8 @@
 /******************************************************************************
 * Program Name: chatclient.c
 * Description: Runs as a client to connect to chatserve and begin chat session
-* Sources: Base code used from CS344 client.c file (winter 2019 term)
+* Sources: Base code used from CS344 client.c file (winter 2019 term) and as
+		noted within code.
 * Author: Brian Metzger (metzgerb@oregonstate.edu)
 * Course: CS372 (Spring 2019)
 * Created: 2019-04-26
@@ -30,11 +31,8 @@ int recvMsg(int socketPtr);
 
 int main(int argc, char *argv[])
 {
-	int socketFD;//, charsWritten;
-	//char buffer[BUFFER_SIZE];
-	//char message[MAX_BUFFER];
+	int socketFD, msgResult;
 	char handle[11];
-	int msgResult;
     
 	//check for correct number of arguments
 	if (argc < 3) 
@@ -66,51 +64,6 @@ int main(int argc, char *argv[])
 	//loop while sending and receiving messages
 	while (1)
 	{
-		/*// Get input message from user
-		printf("%s> ", handle);
-		fflush(stdout);
-		memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
-		fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
-		buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
-
-		//check if '\quit' command received
-		if (strcmp(buffer, "\\quit") == 0)
-		{
-			//Add sentinel before sending quit to server
-			strcat(buffer, SENTINEL);
-			//stop client, send  move to close connection
-			charsWritten = send(socketFD, buffer, strlen(buffer), 0); // Write to the server
-			if (charsWritten < 0) error("# CLIENT: ERROR writing to socket");
-			if (charsWritten < strlen(buffer)) printf("# CLIENT: WARNING: Not all data written to socket!\n");
-			break;
-		}
-
-		//prepend handle to message
-		memset(message, '\0', sizeof(message)); // Clear out the message array
-		strcpy(message, handle);
-		strcat(message, "> ");
-		strcat(message, buffer);
-		strcat(message, SENTINEL);
-
-		// Send message to server
-		long length = strlen(message) + 1;
-		char* sendPtr = message;
-
-		//loop and send message until all is sent
-		//modified from source: https://stackoverflow.com/questions/13479760/c-socket-recv-and-send-all-data
-		while (length > 0)
-		{
-			long s = send(socketFD, sendPtr, length, 0);
-
-			//check for write error
-			if (s < 0)
-			{
-				error("# CLIENT: ERROR writing to socket");
-			}
-			sendPtr += s;
-			length -= s;
-		}*/
-
 		//receive a message from the server
 		msgResult = sendMsg(socketFD, handle);
 
@@ -155,7 +108,8 @@ void error(const char *msg)
  * Inputs: Takes the server and port number of the server
  * Outputs: Returns a socket if connected successfully
  * Description: The function attempts to connect to the specified server and 
-		port using a TCP connection.
+		port using a TCP connection. If socket fails to open, function return -1
+		if socket fails to connect to server, function returns -2.
  ******************************************************************************/
 int connectServer(char* server, int portNumber)
 {
@@ -168,17 +122,26 @@ int connectServer(char* server, int portNumber)
 	serverAddress.sin_family = AF_INET; // Create a network-capable socket
 	serverAddress.sin_port = htons(portNumber); // Store the port number
 	serverHostInfo = gethostbyname(server); // Convert the machine name into a special form of address
-	if (serverHostInfo == NULL) { fprintf(stderr, "# CLIENT: ERROR, no such host\n"); exit(0); }
-	memcpy((char*)&serverAddress.sin_addr.s_addr, (char*)serverHostInfo->h_addr_list[0], serverHostInfo->h_length); // Copy in the address
+	
+	//check if server info could not be obtained
+	if (serverHostInfo == NULL) 
+	{ 
+		error("# CLIENT: ERROR, no such host\n"); 
+	}
+
+	// Copy in the address
+	memcpy((char*)&serverAddress.sin_addr.s_addr, (char*)serverHostInfo->h_addr_list[0], serverHostInfo->h_length); 
 
 	// Set up the socket
 	socketPtr = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
 
 	//check that socket was opened successfully
 	if (socketPtr < 0)
-		return -1; 
+	{
+		return -1;
+	}
 
-	// Connect to server
+	// Connect to server and check that connection was successful
 	if (connect(socketPtr, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0)
 	{
 		return -2;
