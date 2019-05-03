@@ -24,14 +24,13 @@
 //function declarations
 void error(const char *msg);
 int connectServer(char* server, int portNumber);
-void getInput();
-void sendMsg();
+int sendMsg(int socketPtr, char[] handle);
 int recvMsg(int socketPtr);
 
 
 int main(int argc, char *argv[])
 {
-	int socketFD, charsWritten, charsRead;
+	int socketFD, charsWritten;
 	char buffer[BUFFER_SIZE];
 	char message[MAX_BUFFER];
 	char handle[11];
@@ -67,7 +66,7 @@ int main(int argc, char *argv[])
 	//loop while sending and receiving messages
 	while (1)
 	{
-		// Get input message from user
+		/*// Get input message from user
 		printf("%s> ", handle);
 		fflush(stdout);
 		memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
@@ -110,28 +109,18 @@ int main(int argc, char *argv[])
 			}
 			sendPtr += s;
 			length -= s;
-		}
+		}*/
 
-		// Get return message from server
-		/*memset(message, '\0', sizeof(message));
+		//receive a message from the server
+		msgResult = sendMsg(socketFD, handle);
 
-		while (strstr(buffer, SENTINEL) == NULL)
+		//check for a quit command indicator
+		if (msgResult == 1)
 		{
-			memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
-			charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
-			//check for socket read error
-			if (charsRead < 0)
-			{
-				error("# CLIENT: ERROR reading from socket");
-			}
-
-			//add new characters
-			strcat(message, buffer);
+			//move to close the connection
+			break;
 		}
 
-		//strip term sentinel from return message
-		message[strlen(message) - strlen(SENTINEL)] = '\0';*/
-		
 		//receive a message from the server
 		msgResult = recvMsg(socketFD);
 		
@@ -200,25 +189,74 @@ int connectServer(char* server, int portNumber)
 
 
 /******************************************************************************
- * Function name: getInput
- * Inputs: Takes nothing
- * Outputs: Returns a character array
- * Description: The function prompts the user for input and returns a c
+ * Function name: sendMsg
+ * Inputs: Takes the socket to send to and a handle to prepend to messages
+ * Outputs: Returns an integer
+ * Description: The function gets a message from the user. If a quit
+ *		command is received, the function sends a quit command to the server and
+ *		returns 1. All other messages are sent to the server and 0 is returned.
  ******************************************************************************/
-void getInput()
+int sendMsg(int socketPtr, char[] handle)
 {
-}
+	char buffer[BUFFER_SIZE];
+	char message[MAX_BUFFER];
+	int charsWritten;
+	
+	// Get input message from user
+	printf("%s> ", handle);
+	fflush(stdout);
+	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer array
+	fgets(buffer, sizeof(buffer) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
+	buffer[strcspn(buffer, "\n")] = '\0'; // Remove the trailing \n that fgets adds
 
+	//check if '\quit' command received
+	if (strcmp(buffer, "\\quit") == 0)
+	{
+		//Add sentinel before sending quit to server
+		strcat(buffer, SENTINEL);
+		//stop client, send  move to close connection
+		charsWritten = send(socketPtr, buffer, strlen(buffer), 0); // Write to the server
+		
+		//check for errors
+		if (charsWritten < 0)
+		{
+			error("# CLIENT: ERROR writing to socket");
+		}
+		if (charsWritten < strlen(buffer)) //I chose to not loop while sending since the message is small. This will catch any error caused by that choice
+		{
+			printf("# CLIENT: WARNING: Not all data written to socket!\n");
+		}
 
-/******************************************************************************
- * Function name: connect
- * Inputs: Takes the server and port number of the server
- * Outputs: Returns a socket if connected successfully
- * Description: The function attempts to connect to the specified server and
- *		port using a TCP connection.
- ******************************************************************************/
-void sendMsg()
-{
+		return 1;
+	}
+
+	//prepend handle to message
+	memset(message, '\0', sizeof(message)); // Clear out the message array
+	strcpy(message, handle);
+	strcat(message, "> ");
+	strcat(message, buffer);
+	strcat(message, SENTINEL);
+
+	// Send message to server
+	long length = strlen(message) + 1;
+	char* sendPtr = message;
+
+	//loop and send message until all is sent
+	//modified from source: https://stackoverflow.com/questions/13479760/c-socket-recv-and-send-all-data
+	while (length > 0)
+	{
+		long s = send(socketFD, sendPtr, length, 0);
+
+		//check for write error
+		if (s < 0)
+		{
+			error("# CLIENT: ERROR writing to socket");
+		}
+		sendPtr += s;
+		length -= s;
+	}
+
+	return 0;
 }
 
 
