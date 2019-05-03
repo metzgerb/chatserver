@@ -29,14 +29,14 @@ def send_msg(socket, handle, sentinel):
 
 
 #function to receive a message from a specified client
-def recv_msg(socket, sentinel, buffer):
+def recv_msg(socket, sentinel, buffer_size):
     #set initial values to empty strings
     buffer = ""
     message = ""
     
     #call recv in a loop until sentinel is detected in compiled message
     while(sentinel not in message):
-        buffer = socket.recv(buffer).decode()
+        buffer = socket.recv(buffer_size).decode()
         message += buffer
         
     #remove sentinel from message
