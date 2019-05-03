@@ -21,40 +21,27 @@
 #define MAX_BUFFER 700
 #define SENTINEL "@!@"
 
+//function declarations
 void error(const char *msg);
 int connectServer(char* server, int portNumber);
+void getInput();
+void sendMsg();
+char* recvMsg(int socketPtr);
+
 
 int main(int argc, char *argv[])
 {
 	int socketFD, charsWritten, charsRead;
-	//struct sockaddr_in serverAddress;
-	//struct hostent* serverHostInfo;
 	char buffer[BUFFER_SIZE];
 	char message[MAX_BUFFER];
 	char handle[11];
     
+	//check for correct number of arguments
 	if (argc < 3) 
 	{ 
 		fprintf(stderr,"USAGE: %s hostname port\n", argv[0]); 
 		exit(0); 
 	}
-
-	// Set up the server address struct
-	/*memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
-	portNumber = atoi(argv[2]); // Get the port number, convert to an integer from a string
-	serverAddress.sin_family = AF_INET; // Create a network-capable socket
-	serverAddress.sin_port = htons(portNumber); // Store the port number
-	serverHostInfo = gethostbyname(argv[1]); // Convert the machine name into a special form of address
-	if (serverHostInfo == NULL) { fprintf(stderr, "# CLIENT: ERROR, no such host\n"); exit(0); }
-	memcpy((char*)&serverAddress.sin_addr.s_addr, (char*)serverHostInfo->h_addr_list[0], serverHostInfo->h_length); // Copy in the address
-
-	// Set up the socket
-	socketFD = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
-	if (socketFD < 0) error("# CLIENT: ERROR opening socket");
-	
-	// Connect to server
-	if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to address
-		error("# CLIENT: ERROR connecting");*/
 
 	//create socket and connect to server
 	socketFD = connectServer(argv[1], atoi(argv[2]));
@@ -125,7 +112,7 @@ int main(int argc, char *argv[])
 		}
 
 		// Get return message from server
-		memset(message, '\0', sizeof(message));
+		/*memset(message, '\0', sizeof(message));
 
 		while (strstr(buffer, SENTINEL) == NULL)
 		{
@@ -142,7 +129,9 @@ int main(int argc, char *argv[])
 		}
 
 		//strip term sentinel from return message
-		message[strlen(message) - strlen(SENTINEL)] = '\0';
+		message[strlen(message) - strlen(SENTINEL)] = '\0';*/
+
+		message = recvMsg(socketFD);
 		
 		//check for quit message from server
 		if (strcmp(message, "\\quit") == 0)
@@ -174,7 +163,7 @@ void error(const char *msg)
 
 
 /******************************************************************************
- * Function name: connect
+ * Function name: connectServer
  * Inputs: Takes the server and port number of the server
  * Outputs: Returns a socket if connected successfully
  * Description: The function attempts to connect to the specified server and 
@@ -208,4 +197,66 @@ int connectServer(char* server, int portNumber)
 	}
 	
 	return socketPtr;
+}
+
+
+/******************************************************************************
+ * Function name: getInput
+ * Inputs: Takes nothing
+ * Outputs: Returns a character array
+ * Description: The function prompts the user for input and returns a c
+ ******************************************************************************/
+void getInput()
+{
+}
+
+
+/******************************************************************************
+ * Function name: connect
+ * Inputs: Takes the server and port number of the server
+ * Outputs: Returns a socket if connected successfully
+ * Description: The function attempts to connect to the specified server and
+		port using a TCP connection.
+ ******************************************************************************/
+void sendMsg()
+{
+}
+
+
+/******************************************************************************
+ * Function name: recvMsg
+ * Inputs: Takes the socket to receive from
+ * Outputs: Returns the received message
+ * Description: The function attempts to connect to the specified server and
+		port using a TCP connection.
+ ******************************************************************************/
+char* recvMsg(int socketPtr)
+{
+	char buffer[BUFFER_SIZE];
+	char message[MAX_BUFFER];
+	int charsRead;
+
+	memset(buffer, '\0', sizeof(buffer));
+	memset(message, '\0', sizeof(message));
+
+	// Get return message from server
+	while (strstr(buffer, SENTINEL) == NULL)
+	{
+		memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
+		charsRead = recv(socketPtr, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
+		
+		//check for socket read error
+		if (charsRead < 0)
+		{
+			error("# CLIENT: ERROR reading from socket");
+		}
+
+		//add new characters
+		strcat(message, buffer);
+	}
+
+	//strip term sentinel from return message
+	message[strlen(message) - strlen(SENTINEL)] = '\0';
+
+	return message;
 }
