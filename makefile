@@ -1,8 +1,18 @@
 CC = gcc
 CFLAGS = -g -Wall -std=c99
 
+all: chatclient chatserve
+
 chatclient : chatclient.c
 	$(CC) $(CFLAGS) -o $@ $^
 	
-clean :
-	-rm -rf ./chatclient
+cclient:
+	rm -rf ./chatclient
+
+chatserve: chatserve.py
+	chmod +x $^
+
+cserve: chatserve.py
+	chmod -x $^
+
+clean : cclient cserve

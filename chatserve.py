@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Program Name: chatserve.py
 Python Version: 3
 Description: Runs as a server to connect to chatclient and begin chat session
