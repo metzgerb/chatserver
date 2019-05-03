@@ -26,7 +26,7 @@ void error(const char *msg);
 int connectServer(char* server, int portNumber);
 void getInput();
 void sendMsg();
-char* recvMsg(int socketPtr);
+int recvMsg(int socketPtr);
 
 
 int main(int argc, char *argv[])
@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
 	char buffer[BUFFER_SIZE];
 	char message[MAX_BUFFER];
 	char handle[11];
+	int msgResult;
     
 	//check for correct number of arguments
 	if (argc < 3) 
@@ -130,18 +131,16 @@ int main(int argc, char *argv[])
 
 		//strip term sentinel from return message
 		message[strlen(message) - strlen(SENTINEL)] = '\0';*/
-
-		message = recvMsg(socketFD);
 		
-		//check for quit message from server
-		if (strcmp(message, "\\quit") == 0)
+		//receive a message from the server
+		msgResult = recvMsg(socketFD);
+		
+		//check for a quit command indicator
+		if (msgResult == 1)
 		{
-			//close the connection and return
+			//move to close the connection
 			break;
 		}
-
-		printf("%s\n", message);
-		fflush(stdout);
 	}
 
 	close(socketFD); // Close the socket
@@ -216,7 +215,7 @@ void getInput()
  * Inputs: Takes the server and port number of the server
  * Outputs: Returns a socket if connected successfully
  * Description: The function attempts to connect to the specified server and
-		port using a TCP connection.
+ *		port using a TCP connection.
  ******************************************************************************/
 void sendMsg()
 {
@@ -226,11 +225,12 @@ void sendMsg()
 /******************************************************************************
  * Function name: recvMsg
  * Inputs: Takes the socket to receive from
- * Outputs: Returns the received message
- * Description: The function attempts to connect to the specified server and
-		port using a TCP connection.
+ * Outputs: Returns an integer
+ * Description: The function receives a message from the server. If a quit 
+ *		command is received, the function returns 1. All other messages are 
+ *		printed and 0 is returned
  ******************************************************************************/
-char* recvMsg(int socketPtr)
+int recvMsg(int socketPtr)
 {
 	char buffer[BUFFER_SIZE];
 	char message[MAX_BUFFER];
@@ -258,5 +258,15 @@ char* recvMsg(int socketPtr)
 	//strip term sentinel from return message
 	message[strlen(message) - strlen(SENTINEL)] = '\0';
 
-	return (char*) message;
+	//check for quit message from server
+	if (strcmp(message, "\\quit") == 0)
+	{
+		//return quit command
+		return 1;
+	}
+
+	printf("%s\n", message);
+	fflush(stdout);
+
+	return 0;
 }
