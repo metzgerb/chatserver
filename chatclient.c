@@ -30,7 +30,7 @@ int recvMsg(int socketPtr);
 
 int main(int argc, char *argv[])
 {
-	int socketFD//, charsWritten;
+	int socketFD;//, charsWritten;
 	//char buffer[BUFFER_SIZE];
 	//char message[MAX_BUFFER];
 	char handle[11];
