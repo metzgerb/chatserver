@@ -59,8 +59,8 @@ int main(int argc, char *argv[])
 	fflush(stdout);
 	memset(handle, '\0', sizeof(handle)); // Clear out the buffer array
 	fgets(handle, sizeof(handle) - 1, stdin); // Get input from the user, trunc to buffer - 1 chars, leaving \0
-	handle[strcspn(handle, "\n")] = '\0'; // Remove the trailing \n that fgets adds
-	fflush(stdin); //clear input buffer to prevent extra characters from being sent
+	//handle[strcspn(handle, "\n")] = '\0'; // Remove the trailing \n that fgets adds
+	//fflush(stdin); //clear input buffer to prevent extra characters from being sent
 
 	//loop while sending and receiving messages
 	while (1)
