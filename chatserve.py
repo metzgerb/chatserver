@@ -11,7 +11,7 @@ from socket import *
 import sys
 
 #funtion to send a message to a specified client
-def send_msg(client_socket, handle, sentinel):
+def send_msg(socket, handle, sentinel):
     #get input from user
     message = input(handle)
             
@@ -19,23 +19,24 @@ def send_msg(client_socket, handle, sentinel):
     if message == "\\quit":
         #send quit message back with sentinel
         message += sentinel
-        connection_socket.sendall(message.encode())
+        socket.sendall(message.encode())
         return -1          
     else: 
         #send message back
         message = handle + message + sentinel
-        client_socket.sendall(message.encode())
+        socket.sendall(message.encode())
         return 0
 
+
 #function to receive a message from a specified client
-def recv_msg(client_socket, sentinel, max_buffer):
+def recv_msg(socket, sentinel, buffer):
     #set initial values to empty strings
     buffer = ""
     message = ""
     
     #call recv in a loop until sentinel is detected in compiled message
     while(sentinel not in message):
-        buffer = client_socket.recv(max_buffer).decode()
+        buffer = socket.recv(buffer).decode()
         message += buffer
         
     #remove sentinel from message
@@ -48,6 +49,7 @@ def recv_msg(client_socket, sentinel, max_buffer):
         #print message to server
         print(message)
         return message
+
 
 #function that creates the server and sets it to listen for clients
 def setup_server(port_number):
@@ -72,14 +74,14 @@ def setup_server(port_number):
             #receive a message from client
             recd_message = recv_msg(connection_socket, SENTINEL, 700)
             
-            #check if received message was quit
+            #check if received message was quit command
             if recd_message == -1:
                 break
             
             #send message to client
             send_message = send_msg(connection_socket, server_handle, SENTINEL)
             
-            #check if sent message was quit
+            #check if sent message was quit command
             if send_message == -1:
                 break
         
@@ -87,12 +89,14 @@ def setup_server(port_number):
         connection_socket.close()
         
 
-#determine program execution
+#validate arguments and determine program execution
 if __name__ == "__main__":
     #check total argument count
     if len(sys.argv) != 2:
         print("USAGE: %s port" % sys.argv[0])
+    #check that port number is actually a number
     elif not sys.argv[1].isdigit():
         print("syntax error: port must be a number")
+    #everything is ok, call server setup
     else:
         setup_server(int(sys.argv[1]));
