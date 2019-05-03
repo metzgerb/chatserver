@@ -182,7 +182,7 @@ void error(const char *msg)
  ******************************************************************************/
 int connectServer(char* server, int portNumber)
 {
-	int socket;
+	int socketPtr;
 	struct sockaddr_in serverAddress;
 	struct hostent* serverHostInfo;
 
@@ -190,22 +190,22 @@ int connectServer(char* server, int portNumber)
 	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
 	serverAddress.sin_family = AF_INET; // Create a network-capable socket
 	serverAddress.sin_port = htons(portNumber); // Store the port number
-	serverHostInfo = gethostbyname(argv[1]); // Convert the machine name into a special form of address
+	serverHostInfo = gethostbyname(server); // Convert the machine name into a special form of address
 	if (serverHostInfo == NULL) { fprintf(stderr, "# CLIENT: ERROR, no such host\n"); exit(0); }
 	memcpy((char*)&serverAddress.sin_addr.s_addr, (char*)serverHostInfo->h_addr_list[0], serverHostInfo->h_length); // Copy in the address
 
 	// Set up the socket
-	socket = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
+	socketPtr = socket(AF_INET, SOCK_STREAM, 0); // Create the socket
 
 	//check that socket was opened successfully
-	if (socket < 0)
+	if (socketPtr < 0)
 		return -1; 
 
 	// Connect to server
-	if (connect(socket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0)
+	if (connect(socketPtr, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0)
 	{
 		return -2;
 	}
 	
-	return socket;
+	return socketPtr;
 }
